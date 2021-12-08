@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 import { BiChevronLeft } from "react-icons/bi";
 
-export function SidebarSubPanel({ subpanelContent, icon, ...rest }) {
+export function SidebarSubPanel({
+  subpanelContent,
+  icon,
+  alignLeft = false,
+  ...rest
+}) {
   const { children } = rest;
   const [showSubpanel, setShowSubpanel] = useState(false);
 
@@ -11,9 +16,13 @@ export function SidebarSubPanel({ subpanelContent, icon, ...rest }) {
 
   return (
     <div>
-      <div className="mb-4 h-8 flex items-center justify-end">
+      <div
+        className={`mb-4 h-8 flex items-center ${
+          alignLeft ? "justify-start" : "justify-end"
+        }`}
+      >
         <button
-          className="h-7  flex items-center justify-center"
+          className="h-7 flex items-center justify-center"
           type="button"
           onClick={toggleSubpanel}
         >

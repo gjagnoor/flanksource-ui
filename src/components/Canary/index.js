@@ -243,6 +243,87 @@ export class Canary extends React.Component {
 
     return (
       <div className="w-full flex flex-row">
+        {/* sidebar panel */}
+        <div className="ml-6">
+          <Sidebar animated flipped>
+            <SidebarSubPanel
+              alignLeft
+              icon={
+                <AiFillSetting
+                  title="Show settings panel"
+                  className="text-gray-600 h-6 w-6"
+                />
+              }
+              subpanelContent={
+                <>
+                  <div className="uppercase font-semibold text-sm mb-4 text-gray-700">
+                    More Settings
+                  </div>
+                  <div className="mb-4">
+                    <Toggle
+                      label="Auto-refresh"
+                      className="mb-3"
+                      value={autoRefresh}
+                      onChange={this.handleAutoRefreshChange}
+                    />
+                  </div>
+
+                  {autoRefresh && (
+                    <div className="mb-4">
+                      <RefreshIntervalDropdown
+                        className="w-full"
+                        defaultValue={refreshInterval}
+                        onChange={this.handleRefreshIntervalChange}
+                      />
+                    </div>
+                  )}
+                </>
+              }
+            >
+              <StatCard
+                title="All Checks"
+                className="mb-4"
+                customValue={
+                  <>
+                    {stateChecks.length}
+                    <span className="text-xl font-light">
+                      {" "}
+                      (<span className="text-green-500">{passedAll}</span>/
+                      <span className="text-red-500">
+                        {stateChecks.length - passedAll}
+                      </span>
+                      )
+                    </span>
+                  </>
+                }
+              />
+
+              {checks.length !== stateChecks.length && (
+                <StatCard
+                  title="Filtered Checks"
+                  className="mb-4"
+                  customValue={
+                    <>
+                      {checks.length}
+                      <span className="text-xl  font-light">
+                        {" "}
+                        (<span className="text-green-500">{passed}</span>/
+                        <span className="text-red-500">
+                          {checks.length - passed}
+                        </span>
+                        )
+                      </span>
+                    </>
+                  }
+                />
+              )}
+
+              {/* filtering tools */}
+              <FilterForm {...filterProps} />
+            </SidebarSubPanel>
+          </Sidebar>
+        </div>
+
         {/* middle panel */}
         <div className="w-full flex flex-col justify-between px-4 mb-4">
           <div className="relative">
@@ -377,6 +458,7 @@ export class Canary extends React.Component {
             </SidebarSubPanel>
           </Sidebar>
         </div>
+
         {selected != null && (
           <Modal
             ref={this.modal}

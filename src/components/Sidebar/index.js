@@ -1,9 +1,15 @@
 import { useState } from "react";
 import { IoChevronBackCircle } from "react-icons/io5";
 
-export function Sidebar({ animated = false, settings, ...rest }) {
+export function Sidebar({
+  animated = false,
+  settings,
+  flipped = false,
+  ...rest
+}) {
   const { children, className } = rest;
   const [collapsed, setCollapsed] = useState(false);
+
   return (
     <div
       className={`border border-gray-200 h-screen sticky top-0 ${
@@ -12,9 +18,10 @@ export function Sidebar({ animated = false, settings, ...rest }) {
     >
       <button
         title={`${collapsed ? "Show" : "Hide"} sidebar`}
-        className={`z-10 transform absolute top-5 -left-3 ${
-          collapsed ? "" : "rotate-180"
-        }`}
+        className={`z-10 transform absolute top-5 
+          ${flipped ? "-right-3" : "-left-3"} 
+          ${collapsed === flipped ? "rotate-180" : ""}
+        `}
         type="button"
         onClick={() => setCollapsed(!collapsed)}
       >
