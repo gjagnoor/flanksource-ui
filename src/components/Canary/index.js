@@ -244,8 +244,8 @@ export class Canary extends React.Component {
     return (
       <div className="w-full flex flex-row">
         {/* sidebar panel */}
-        <div className="ml-6">
-          <Sidebar animated flipped>
+        <div className="ml-0 lg:ml-6">
+          <Sidebar animated flipped floatWidthRange={[0, 1024]}>
             <SidebarSubPanel
               alignLeft
               icon={
@@ -331,7 +331,7 @@ export class Canary extends React.Component {
               onChange={debounce((e) => this.handleSearch(e.target.value), 500)}
               onSubmit={(value) => this.handleSearch(value)}
               onClear={this.handleSearchClear}
-              className="pt-4 pb-2 sticky top-0 z-10 bg-white"
+              className="pt-4 pb-2 sticky top-0 z-10 bg-white px-6"
               inputClassName="w-full"
               inputOuterClassName="z-10 w-full md:w-1/2"
               placeholder="Search by name, description, or endpoint"
@@ -380,8 +380,8 @@ export class Canary extends React.Component {
         </div>
 
         {/* sidebar panel */}
-        <div className="mr-6">
-          <Sidebar animated>
+        <div className="mr-0 lg:mr-6">
+          <Sidebar animated floatWidthRange={[0, 1024]}>
             <SidebarSubPanel
               icon={
                 <AiFillSetting
