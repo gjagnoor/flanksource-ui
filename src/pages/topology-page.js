@@ -37,13 +37,23 @@ export const healthTypes = [
   }
 ];
 
+export const tempTypes = [
+  {
+    icon: <AiOutlineStop />,
+    description: "None",
+    value: "none"
+  }
+];
+
+// to be removed after integrating with API
 const mockLabels = [
   { value: "chocolate", label: "Chocolate" },
   { value: "strawberry", label: "Strawberry" },
-  { value: "vanilla", label: "Vanilla" }
+  { value: "vanilla", label: "Vanilla" },
+  { value: "banana", label: "Banana" },
+  { value: "grape", label: "Grape" },
+  { value: "pear", label: "Pear" }
 ];
-
-const labels = [...mockLabels];
 
 const labelDropdownStyles = {
   valueContainer: (provided) => ({
@@ -68,7 +78,9 @@ export function TopologyPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { control, getValues } = useForm({
     defaultValues: {
-      health: searchParams.get("health") || healthTypes[0].value
+      owner: searchParams.get("owner") || tempTypes[0].value,
+      health: searchParams.get("health") || healthTypes[0].value,
+      type: searchParams.get("type") || tempTypes[0].value
     }
   });
   // const navigate = useNavigate();
@@ -83,40 +95,28 @@ export function TopologyPage() {
       params.id = id;
     }
 
-    /// temp start
-    const topology = filter(
-      topData,
-      (i) => (i.name != null || i.title != null) && i.type !== "summary"
-    );
-    setTopology(topology);
+    getTopology(params)
+      .then((res) => {
+        setIsLoading(false);
+        if (res == null) {
+          return null;
+        }
 
-    console.log("top", topology);
-    setIsLoading(false);
-    // temp end
+        if (res.error != null) {
+          toastError(res.error);
+          return null;
+        }
 
-    // getTopology(params)
-    //   .then((res) => {
-    //     setIsLoading(false);
-
-    //     if (res == null) {
-    //       return null;
-    //     }
-
-    //     if (res.error != null) {
-    //       toastError(res.error);
-    //       return null;
-    //     }
-
-    //     const topology = filter(
-    //       res.data,
-    //       (i) => (i.name != null || i.title != null) && i.type !== "summary"
-    //     );
-    //     setTopology(topology);
-    //   })
-    //   .catch((e) => {
-    //     setIsLoading(false);
-    //     toastError(e);
-    //   });
+        const topology = filter(
+          res.data,
+          (i) => (i.name != null || i.title != null) && i.type !== "summary"
+        );
+        setTopology(topology);
+      })
+      .catch((e) => {
+        setIsLoading(false);
+        toastError(e);
+      });
   };
   useEffect(() => {
     if (topology != null) {
@@ -142,6 +142,24 @@ export function TopologyPage() {
       extra={
         <>
           <div className="flex items-center mr-4">
+            <div className="mr-3 text-gray-500 text-sm">Owner</div>
+            <Dropdown
+              control={control}
+              name="owner"
+              className="w-36 mr-2 flex-shrink-0"
+              items={tempTypes}
+            />
+          </div>
+          <div className="flex items-center mr-4">
+            <div className="mr-3 text-gray-500 text-sm">Labels</div>
+            <MultiSelectDropdown
+              styles={labelDropdownStyles}
+              className="w-full"
+              options={mockLabels} // change this to actual labels fetched from API
+              onChange={(labels) => handleLabelChange(labels)}
+            />
+          </div>
+          <div className="flex items-center mr-4">
             <div className="mr-3 text-gray-500 text-sm">Health</div>
             <Dropdown
               control={control}
@@ -151,12 +169,12 @@ export function TopologyPage() {
             />
           </div>
           <div className="flex items-center">
-            <div className="mr-3 text-gray-500 text-sm">Label</div>
-            <MultiSelectDropdown
-              styles={labelDropdownStyles}
-              className="w-full"
-              options={labels}
-              onChange={(labels) => handleLabelChange(labels)}
+            <div className="mr-3 text-gray-500 text-sm">Type</div>
+            <Dropdown
+              control={control}
+              name="type"
+              className="w-36 mr-2 flex-shrink-0"
+              items={tempTypes}
             />
           </div>
         </>
