@@ -16,7 +16,7 @@ import { toastError } from "../components/Toast/toast";
 import { TopologyCard } from "../components/Topology";
 import { TopologyBreadcrumbs } from "../components/Topology/topology-breadcrumbs";
 
-import topData from "../data/sampleTopologyData.json";
+// import topData from "../data/sampleTopologyData.json";
 import { MultiSelectDropdown } from "../components/MultiSelectDropdown";
 
 export const healthTypes = [
@@ -76,13 +76,14 @@ const labelDropdownStyles = {
 
 export function TopologyPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { control, getValues } = useForm({
+  const { control, getValues, watch } = useForm({
     defaultValues: {
       owner: searchParams.get("owner") || tempTypes[0].value,
       health: searchParams.get("health") || healthTypes[0].value,
       type: searchParams.get("type") || tempTypes[0].value
     }
   });
+  const [selectedLabels, setSelectedLabels] = useState([]);
   // const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [topology, setTopology] = useState(null);
@@ -125,9 +126,30 @@ export function TopologyPage() {
   }, [topology, id]);
   useEffect(load, [id, searchParams]);
 
-  const handleLabelChange = (labels) => {
-    console.log("l", labels);
+  const saveSearchParams = () => {
+    const labelsArray = selectedLabels.map((o) => o.value);
+    const encodedLabels = encodeURIComponent(JSON.stringify(labelsArray));
+    const paramsList = {
+      labels: encodedLabels,
+      ...getValues()
+    };
+    const params = {};
+    Object.entries(paramsList).forEach(([key, value]) => {
+      if (value) {
+        params[key] = value;
+      }
+    });
+    setSearchParams(params);
   };
+
+  const watchOwner = watch("owner");
+  const watchHealth = watch("health");
+  const watchType = watch("type");
+
+  useEffect(() => {
+    saveSearchParams();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [watchOwner, watchHealth, watchType, selectedLabels]);
 
   return (
     <SearchLayout
@@ -156,7 +178,8 @@ export function TopologyPage() {
               styles={labelDropdownStyles}
               className="w-full"
               options={mockLabels} // change this to actual labels fetched from API
-              onChange={(labels) => handleLabelChange(labels)}
+              onChange={(labels) => setSelectedLabels(labels)}
+              value={selectedLabels}
             />
           </div>
           <div className="flex items-center mr-4">
