@@ -1,31 +1,28 @@
 import { useEffect, useMemo, useState } from "react";
-
 import clsx from "clsx";
+import { template } from "lodash";
 import { useForm } from "react-hook-form";
 import { BsShareFill, BsTrash } from "react-icons/bs";
-import { template } from "lodash";
-
+import { DeleteConfirmDialog } from "../DeleteConfirmDialog";
 import { Icon } from "../Icon";
 import { IconButton } from "../IconButton";
-import { toastError, toastSuccess } from "../Toast/toast";
-import { IncidentDetailsRow } from "./IncidentDetailsRow";
 import { ReactSelectDropdown } from "../ReactSelectDropdown";
-import { DeleteConfirmDialog } from "../DeleteConfirmDialog";
+import { toastError, toastSuccess } from "../Toast/toast";
+import { AddResponder, ResponderPropsKeyToLabelMap } from "./AddResponder";
+import { IncidentDetailsRow } from "./IncidentDetailsRow";
 import { ResponderDetailsDialog } from "./ResponderDetailsDialog";
 import { ResponderDetailsToolTip } from "./ResponderDetailsToolTip";
-import { AddResponder, ResponderPropsKeyToLabelMap } from "./AddResponder";
-
 import { severityItems, statusItems, typeItems } from "../Incidents/data";
 import { IncidentPriority } from "../../constants/incidentPriority";
+import { Incident, IncidentStatus } from "../../api/services/incident";
 import {
   deleteResponder,
   getRespondersForTheIncident
 } from "../../api/services/responder";
 import { relativeDateTime } from "../../utils/date";
 import { DefinitionOfDone } from "./DefinitionOfDone";
-import { Incident, IncidentStatus } from "../../api/services/incident";
 import IncidentTypeDropdown from "../Incidents/IncidentTypeDropdown";
-import { IncidentWorkflow } from "./IncidentWorkflow";;
+import { IncidentWorkflow } from "./IncidentWorkflow";
 
 export const priorities = Object.entries(severityItems).map(([key, value]) => ({
   label: value.name,
@@ -84,7 +81,9 @@ export const IncidentDetails = ({
         ? incident.type
         : "",
       commanders: incident.commander.id,
-      status: statusItems[incident.status as keyof typeof statusItems] ? incident.status : ""
+      status: statusItems[incident.status as keyof typeof statusItems]
+        ? incident.status
+        : ""
     }
   });
 
@@ -128,7 +127,7 @@ export const IncidentDetails = ({
               )({
                 ID: item.external_id
               });
-            } catch (ex) { }
+            } catch (ex) {}
           }
         }
         return {
@@ -319,7 +318,7 @@ export const IncidentDetails = ({
                             )}
                             <div
                               className="inline-block pl-1 align-middle"
-                              onClick={(e) => {
+                              onClick={() => {
                                 setOpenResponderDetailsDialog(true);
                                 setSelectedResponder(responder);
                               }}
