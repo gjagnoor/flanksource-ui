@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, UseQueryOptions } from "@tanstack/react-query";
 import { toastError } from "../../components/Toast/toast";
 import {
   getAllChanges,
@@ -9,6 +9,10 @@ import {
 } from "../services/configs";
 import { getHypothesisResponse } from "../services/hypothesis";
 import { getIncident } from "../services/incident";
+import {
+  getIncidentHistory,
+  IncidentHistory
+} from "../services/IncidentsHistory";
 import {
   getHealthCheckItem,
   getTopology,
@@ -265,5 +269,16 @@ export function useGetConfigByIdQuery(id: string) {
     {
       onError: (err: any) => toastError(err)
     }
+  );
+}
+
+export function useIncidentsHistoryQuery(
+  incidentId: string,
+  options?: UseQueryOptions<IncidentHistory[], Error>
+) {
+  return useQuery<IncidentHistory[], Error>(
+    ["incident_histories", incidentId],
+    () => getIncidentHistory(incidentId),
+    options
   );
 }

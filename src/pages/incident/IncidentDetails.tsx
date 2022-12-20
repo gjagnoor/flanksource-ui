@@ -14,7 +14,7 @@ import {
   IncidentStatus,
   updateIncident
 } from "../../api/services/incident";
-import { Changelog } from "../../components/Change";
+import { IncidentChangelog } from "../../components/Changelog/IncidentChangelog";
 import { HypothesisBuilder } from "../../components/Hypothesis/HypothesisBuilder";
 import { IncidentDetails } from "../../components/IncidentDetails";
 import { SearchLayout } from "../../components/Layout";
@@ -197,7 +197,7 @@ export function IncidentDetailsPage() {
               updateIncidentHandler={updateIncidentHandler}
               textButton={status === IncidentStatus.Open ? "Close" : "Reopen"}
             />
-            <Changelog />
+            <IncidentChangelog incidentId={incident.id} />
           </div>
         </SlidingSideBar>
       </div>

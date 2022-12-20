@@ -25,7 +25,7 @@ import { relativeDateTime } from "../../utils/date";
 import { DefinitionOfDone } from "./DefinitionOfDone";
 import { Incident, IncidentStatus } from "../../api/services/incident";
 import IncidentTypeDropdown from "../Incidents/IncidentTypeDropdown";
-import { IncidentWorkflow } from "./IncidentWorkflow";;
+import { IncidentWorkflow } from "./IncidentWorkflow";
 
 export const priorities = Object.entries(severityItems).map(([key, value]) => ({
   label: value.name,
@@ -82,9 +82,11 @@ export const IncidentDetails = ({
       priority: incident.severity ?? IncidentPriority.High,
       type: typeItems[incident.type as keyof typeof typeItems]
         ? incident.type
-        : "",
+        : undefined,
       commanders: incident.commander.id,
-      status: statusItems[incident.status as keyof typeof statusItems] ? incident.status : ""
+      status: statusItems[incident.status as keyof typeof statusItems]
+        ? incident.status
+        : undefined
     }
   });
 
@@ -128,7 +130,7 @@ export const IncidentDetails = ({
               )({
                 ID: item.external_id
               });
-            } catch (ex) { }
+            } catch (ex) {}
           }
         }
         return {
