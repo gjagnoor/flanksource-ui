@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 
 export function useOnMouseActivity() {
-  const ref = useRef<HTMLElement>();
+  const ref = useRef<HTMLDivElement>();
 
   const [isActive, setIsActive] = useState(false);
 
   useEffect(() => {
     const listener = (event: MouseEvent) => {
-      if (ref.current?.contains(event.target)) {
+      if (ref.current?.contains(event.target as Node)) {
         return;
       }
       setIsActive(false);

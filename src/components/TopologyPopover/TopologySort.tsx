@@ -1,15 +1,11 @@
 import clsx from "clsx";
-import { BsSortDown, BsSortUp } from "react-icons/bs";
-
-import { SetURLSearchParams } from "../TopologyPopover";
-
-import { isDate } from "../../utils/date";
-import { searchParamsToObj } from "../../utils/common";
-import { useOnMouseActivity } from "../../hooks/useMouseActivity";
-
-import type { Topology, ValueType } from "../../context/TopologyPageContext";
 import { uniq } from "lodash";
+import { LegacyRef } from "react";
+import { BsSortDown, BsSortUp } from "react-icons/bs";
+import type { Topology, ValueType } from "../../context/TopologyPageContext";
+import { useOnMouseActivity } from "../../hooks/useMouseActivity";
 import { saveSortBy, saveSortOrder } from "../../pages/TopologyPage";
+import { isDate } from "../../utils/date";
 
 const STATUS = {
   info: 0,
@@ -48,8 +44,8 @@ export function getSortLabels(topology: Topology[]) {
 }
 
 function getTopologyValue(t: Topology, sortBy: string) {
-  if (Boolean(t[sortBy])) {
-    return t[sortBy] as ValueType;
+  if (!!t[sortBy as keyof Topology]) {
+    return t[sortBy as keyof Topology] as ValueType;
   }
 
   const property = t?.properties?.find((p) => p.name === sortBy);
@@ -86,8 +82,8 @@ export function getSortedTopology(
     }
 
     if (sortBy === "status") {
-      t1Value = STATUS[t1Value];
-      t2Value = STATUS[t2Value];
+      t1Value = STATUS[t1Value as keyof typeof STATUS];
+      t2Value = STATUS[t2Value as keyof typeof STATUS];
     }
 
     if (t1Value && t2Value) {
@@ -106,60 +102,50 @@ export function getSortedTopology(
 
 type SortLabel = typeof defaultSortLabels;
 
-export const TopologySort = ({
+type SortOptionProps = {
+  title?: string;
+  sortLabels: SortLabel;
+  onSortChange?: (sortBy: string, sortOrder: string) => void;
+  sortBy?: string;
+  sortOrder?: string;
+};
+
+export function TopologySort({
   title = "Sort By",
   sortLabels,
-  searchParams,
-  setSearchParams
-}: {
-  title?: string;
-  searchParams: URLSearchParams;
-  setSearchParams: SetURLSearchParams;
-  sortLabels: SortLabel;
-}) => {
+  onSortChange = () => {},
+  sortBy,
+  sortOrder
+}: SortOptionProps) {
   const {
     ref: popoverRef,
     isActive: isPopoverActive,
     setIsActive: setIsPopoverActive
   } = useOnMouseActivity();
 
-  function onSelectSortOption(currentSortBy?: string, newSortByType?: string) {
-    currentSortBy = currentSortBy ?? "status";
-    newSortByType = newSortByType ?? "desc";
-
-    const newSearchParams = {
-      ...searchParamsToObj(searchParams),
-      sortBy: currentSortBy,
-      sortOrder: newSortByType
-    };
-
-    if (currentSortBy === "status" && newSortByType === "desc") {
-      const { sortBy, sortOrder, ...removedSearchParams } = newSearchParams;
-      setSearchParams(removedSearchParams);
-    } else {
-      setSearchParams(newSearchParams);
-    }
-    saveSortBy(newSearchParams.sortBy, sortLabels);
-    saveSortOrder(newSearchParams.sortOrder);
+  function onSelectSortOption(sortBy?: string, sortOrder?: string) {
+    saveSortBy(sortBy ?? "status", sortLabels);
+    saveSortOrder(sortOrder ?? "desc");
+    onSortChange(sortBy ?? "status", sortOrder ?? "desc");
     setIsPopoverActive(false);
   }
-
-  const sortBy = searchParams.get("sortBy") ?? "status";
-  const sortByDirection = searchParams.get("sortOrder") ?? "desc";
 
   return (
     <>
       <div
-        ref={popoverRef}
+        // there is a mismatch between react types version and react version, we
+        // need to fix this by deciding whether to upgrade react to ^18 or downgrade react
+        // types to ^17
+        ref={popoverRef as LegacyRef<HTMLDivElement>}
         className="flex mt-1 cursor-pointer md:mt-0 md:items-center border border-gray-300 bg-white rounded-md shadow-sm px-3 py-2"
       >
-        {sortByDirection === "asc" && (
+        {sortOrder === "asc" && (
           <BsSortUp
             className="w-5 h-5 text-gray-700 hover:text-gray-900"
             onClick={() => onSelectSortOption(sortBy, "desc")}
           />
         )}
-        {sortByDirection === "desc" && (
+        {sortOrder === "desc" && (
           <BsSortDown
             className="w-5 h-5 text-gray-700 hover:text-gray-900"
             onClick={() => onSelectSortOption(sortBy, "asc")}
@@ -189,15 +175,13 @@ export const TopologySort = ({
                 onClick={() =>
                   onSelectSortOption(
                     sortBy,
-                    sortByDirection === "asc" ? "desc" : "asc"
+                    sortOrder === "asc" ? "desc" : "asc"
                   )
                 }
                 className="flex mx-1 text-gray-600 cursor-pointer hover:text-gray-900"
               >
-                {sortByDirection === "asc" && <BsSortUp className="w-5 h-5" />}
-                {sortByDirection === "desc" && (
-                  <BsSortDown className="w-5 h-5" />
-                )}
+                {sortOrder === "asc" && <BsSortUp className="w-5 h-5" />}
+                {sortOrder === "desc" && <BsSortDown className="w-5 h-5" />}
               </div>
             </div>
           </div>
@@ -210,8 +194,8 @@ export const TopologySort = ({
                     onSelectSortOption(
                       s.value,
                       sortBy !== s.value
-                        ? sortByDirection
-                        : sortByDirection === "asc"
+                        ? sortOrder
+                        : sortOrder === "asc"
                         ? "desc"
                         : "asc"
                     )
@@ -230,4 +214,4 @@ export const TopologySort = ({
       </div>
     </>
   );
-};
+}

@@ -1,28 +1,23 @@
-import { NavigateOptions, URLSearchParamsInit } from "react-router-dom";
+import { TopologyPreference } from "./TopologyPreference";
+import { defaultSortLabels, TopologySort } from "./TopologySort";
 
-import { TopologyPreference } from "./topologyPreference";
-import { defaultSortLabels, TopologySort } from "./topologySort";
-
-export type SetURLSearchParams = (
-  nextInit?:
-    | URLSearchParamsInit
-    | ((prev: URLSearchParams) => URLSearchParamsInit),
-  navigateOpts?: NavigateOptions
-) => void;
-
-export const TopologyPopOver = ({
-  size,
-  setSize,
-  sortLabels,
-  searchParams,
-  setSearchParams
-}: {
+type TopologyPopOverProps = {
   size: string;
   sortLabels: typeof defaultSortLabels;
   setSize: (v: string) => void;
-  searchParams: URLSearchParams;
-  setSearchParams: SetURLSearchParams;
-}) => {
+  onSortChange?: (sortBy: string, sortOrder: string) => void;
+  sortBy?: string;
+  sortOrder?: string;
+};
+
+export function TopologyPopOver({
+  size,
+  setSize,
+  sortLabels,
+  sortBy,
+  sortOrder,
+  onSortChange
+}: TopologyPopOverProps) {
   const setCardWidth = (width: string) => {
     setSize(`${width}px`);
     localStorage.setItem("topology_card_width", `${width}px`);
@@ -32,12 +27,13 @@ export const TopologyPopOver = ({
     <div className="relative pt-5 sm:flex md:self-center md:pt-0 pl-3 flex items-center">
       <TopologySort
         sortLabels={sortLabels}
-        searchParams={searchParams}
-        setSearchParams={setSearchParams}
+        onSortChange={onSortChange}
+        sortBy={sortBy}
+        sortOrder={sortOrder}
       />
       <TopologyPreference cardSize={size} setCardWidth={setCardWidth} />
     </div>
   );
-};
+}
 
 export default TopologyPopOver;

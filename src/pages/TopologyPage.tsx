@@ -11,11 +11,11 @@ import CardsSkeletonLoader from "../components/SkeletonLoader/CardsSkeletonLoade
 import { toastError, toastSuccess } from "../components/Toast/toast";
 import { TopologyCard } from "../components/TopologyCard";
 import { TopologyPopOver } from "../components/TopologyPopover";
-import { getCardWidth } from "../components/TopologyPopover/topologyPreference";
+import { getCardWidth } from "../components/TopologyPopover/TopologyPreference";
 import {
   getSortedTopology,
   getSortLabels
-} from "../components/TopologyPopover/topologySort";
+} from "../components/TopologyPopover/TopologySort";
 import TopologySidebar from "../components/TopologySidebar";
 
 import { getAll } from "../api/schemaResources";
@@ -28,7 +28,6 @@ import {
   useTopologyPageContext
 } from "../context/TopologyPageContext";
 import { useLoader } from "../hooks";
-import { searchParamsToObj } from "../utils/common";
 
 export const allOption = {
   All: {
@@ -104,6 +103,14 @@ export function TopologyPage() {
 
   const [currentTopology, setCurrentTopology] = useState<Topology>();
 
+  const [topologySortBy, setTopologySortBy] = useState(
+    () => localStorage.getItem("topologyCardsSortBy") ?? "status"
+  );
+
+  const [topologySortOrder, setTopologySortOrder] = useState(
+    () => localStorage.getItem("topologyCardsSortOrder") ?? "desc"
+  );
+
   const [teams, setTeams] = useState<any>({});
   const [size, setSize] = useState(() => getCardWidth());
 
@@ -121,25 +128,6 @@ export function TopologyPage() {
     }
     return getSortLabels(topology);
   }, [topology]);
-
-  useEffect(() => {
-    if (!sortLabels) {
-      return;
-    }
-    const sortBy = getSortBy(sortLabels) || "status";
-    const sortOrder = localStorage.getItem("topologyCardsSortOrder") || "desc";
-    setSearchParams(
-      {
-        ...searchParamsToObj(searchParams),
-        sortBy,
-        sortOrder
-      },
-      {
-        // this will replace the history, so that the back button will work as expected
-        replace: true
-      }
-    );
-  }, [searchParams, setSearchParams, sortLabels]);
 
   const load = useCallback(async () => {
     const params = Object.fromEntries(searchParams);
@@ -364,16 +352,20 @@ export function TopologyPage() {
               size={size}
               setSize={setSize}
               sortLabels={sortLabels || []}
-              searchParams={searchParams}
-              setSearchParams={setSearchParams}
+              sortBy={topologySortBy}
+              sortOrder={topologySortOrder}
+              onSortChange={(sortBy: string, sortOrder: string) => {
+                setTopologySortBy(sortBy);
+                setTopologySortOrder(sortOrder);
+              }}
             />
           </div>
           <div className="flex leading-1.21rel w-full mt-4">
             <div className="flex flex-wrap w-full">
               {getSortedTopology(
                 topology,
-                getSortBy(sortLabels || []),
-                getSortOrder()
+                topologySortBy,
+                topologySortOrder
               ).map((item) => (
                 <TopologyCard
                   key={item.id}
