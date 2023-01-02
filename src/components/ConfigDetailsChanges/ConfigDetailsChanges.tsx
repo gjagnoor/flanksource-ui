@@ -35,25 +35,12 @@ export function ConfigDetailsChanges({
     }
     return [
       {
-        label: "Name",
-        value: (
-          <>
-            <Icon
-              name={changeDetails.change_type}
-              secondary="diff"
-              className="w-5 h-auto pr-1"
-            />
-            {changeDetails.change_type}
-          </>
-        )
+        label: "Source",
+        value: changeDetails.source! || "NA"
       },
       {
         label: "Date",
         value: formatISODate(changeDetails.created_at!)
-      },
-      {
-        label: "Source",
-        value: changeDetails.source! || "NA"
       },
       {
         label: "Created By",
@@ -98,7 +85,7 @@ export function ConfigDetailsChanges({
           e?.stopPropagation();
           setOpen(false);
         }}
-        size="large"
+        size="full"
         bodyClass=""
       >
         <div
@@ -140,7 +127,7 @@ export function ConfigDetailsChanges({
       </Modal>
       {viewType === "detailed" && (
         <div className="px-4 py-5">
-          <DescriptionCard items={properties} labelStyle="top" noOfCols={2} />
+          <DescriptionCard items={properties} labelStyle="top" noOfCols={3} />
           <DescriptionCard
             className="mt-2"
             items={[
@@ -163,23 +150,25 @@ export function ConfigDetailsChanges({
             ]}
             labelStyle="top"
           />
-          <DescriptionCard
-            className="mt-4"
-            items={[
-              {
-                label: "Change",
-                value: (
-                  <div className="w-full max-h-56 overflow-y-auto overflow-x-auto border border-gray-200 rounded">
-                    <JSONViewer
-                      code={JSON.stringify(changeDetails?.patches, null, 2)}
-                      format="json"
-                    />
-                  </div>
-                )
-              }
-            ]}
-            labelStyle="top"
-          />
+          {changeDetails?.patches && (
+            <DescriptionCard
+              className="mt-4"
+              items={[
+                {
+                  label: "Change",
+                  value: (
+                    <div className="w-full max-h-56 overflow-y-auto overflow-x-auto border border-gray-200 rounded">
+                      <JSONViewer
+                        code={JSON.stringify(changeDetails?.patches, null, 2)}
+                        format="json"
+                      />
+                    </div>
+                  )
+                }
+              ]}
+              labelStyle="top"
+            />
+          )}
         </div>
       )}
       {viewType === "summary" && (
